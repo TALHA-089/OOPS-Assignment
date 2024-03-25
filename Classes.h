@@ -3,7 +3,7 @@
 #include<string>
 #include<list>
 
-using namespace std;
+using namespace std; 
 
 
 class Person;
@@ -16,7 +16,7 @@ class User;
 
 class Person
 {
-public:
+    public:
 
     string Name;
     int ID;
@@ -24,7 +24,7 @@ public:
 
 class Thing
 {
-public:
+    public:
 
     string name;
     string code;
@@ -32,7 +32,7 @@ public:
 
 class Student : public Person
 {
-public:
+    public:
 
     string studentSection;
 
@@ -40,20 +40,19 @@ public:
 
 class Teacher : public Person
 {
-public:
+    public:
 
-    Teacher(string name, string specialization) {
-
-        this->Name = name;
+    Teacher (string name, string specialization)
+    {
+        this->Name=name;
         this->specialization = specialization;
     }
-
     string specialization;
 };
 
 class Room : public Thing
 {
-public:
+    public:
 
     int capacity;
     list<std::shared_ptr<Student> > students;  //Smart Pointers(Allows Multiple Pointers to point at the Same object) 
@@ -61,20 +60,20 @@ public:
 
 class Course : public Thing
 {
-public:
+    public:
 
     Teacher* teacher;
     string timeslot;
     Room* room;
 };
 
-class User
+class User 
 {
-private:
+    private:
     string username;
     string password;
 
-public:
+    public:
 
     User(string Username, string Password)
     {
@@ -82,7 +81,7 @@ public:
         password = Password;
     }
 
-    bool authenticate(string Username, string Password)
+    bool authenticate(string Username, string Password) 
     {
         return (username == Username && password == Password);
     }
@@ -93,19 +92,19 @@ public:
     }
 };
 
-class SYSTEM
+class SYSTEM 
 {
-private:
+    private:
 
     User* currentUser; //Pointer to the Current User
 
-public:
+    public:
     SYSTEM()
     {
         currentUser = nullptr;
     }
 
-    void setUser()
+    void setUser() 
     {
         string username, password;
         cout << "\n\nEnter username: ";
@@ -120,13 +119,15 @@ public:
     {
         string username, password;
         cout << "\n\nEnter username: ";
-        cin >> username;
+        cin.ignore();
+        getline(cin,username);
         cout << "\n\nEnter password: ";
-        cin >> password;
+        cin.ignore();
+        getline(cin,password);
 
-        if (currentUser != nullptr)
+        if (currentUser != nullptr) 
         {
-            if (currentUser->authenticate(username, password))
+            if (currentUser->authenticate(username, password)) 
             {
                 cout << "\n\nLogin successful. Welcome, " << currentUser->getUsername() << "!\n";
                 return true;
@@ -138,8 +139,8 @@ public:
             }
         }
     }
-
-    ~SYSTEM()
+    
+    ~SYSTEM() 
     {
         delete currentUser; //Current user was dynamically allocated using the keyword 'new'
     }
