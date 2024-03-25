@@ -25,12 +25,12 @@ void generateTeacherWiseTimeTable(const vector<Course>& courses)
 {
     map <string, vector<Course> > teacherTimeTable;
 
-    for (const auto& course : courses) 
+    for (const auto& course : courses)
     {
         teacherTimeTable[course.teacher->Name].push_back(course);
     }
 
-    for (const auto& entry : teacherTimeTable) 
+    for (const auto& entry : teacherTimeTable)
     {
         cout << "\n\nTeacher: " << entry.first << endl;
         displayTimeTable(entry.second);
@@ -42,14 +42,14 @@ void generateSectionWiseTimeTable(const vector<Course>& courses)
 {
     map <string, vector<Course> > sectionTimeTable;
 
-    for(const auto& course : courses)
+    for (const auto& course : courses)
     {
         sectionTimeTable[course.room->code].push_back(course);
     }
 
-    for(const auto& entry : sectionTimeTable)
+    for (const auto& entry : sectionTimeTable)
     {
-        cout << "\n\nRoom: " << entry.first <<endl;
+        cout << "\n\nRoom: " << entry.first << endl;
         displayTimeTable(entry.second);
         cout << endl << endl;
     }
@@ -59,12 +59,12 @@ void generateRoomWiseTimeTable(const vector<Course>& courses)
 {
     map <string, vector<Course> > roomTimeTable;
 
-    for(const auto& course : courses)
+    for (const auto& course : courses)
     {
         roomTimeTable[course.room->code].push_back(course);
     }
 
-    for(const auto& entry : roomTimeTable)
+    for (const auto& entry : roomTimeTable)
     {
         cout << "\n\nRoom: " << entry.first << endl;
         displayTimeTable(entry.second);
@@ -72,11 +72,11 @@ void generateRoomWiseTimeTable(const vector<Course>& courses)
     }
 }
 
-void displayTimeTableForTime(const vector<Course>& courses, const string& time, const string& day) 
+void displayTimeTableForTime(const vector<Course>& courses, const string& time, const string& day)
 {
     cout << "\n\nCourses at " << time << " on " << day << ": " << endl;
 
-    for (const auto& course: courses) 
+    for (const auto& course : courses)
     {
         if (course.timeslot == time + " " + day) {
             cout << "\n\nCourse: " << course.name << ", Teacher: " << course.teacher->Name << endl;
@@ -84,49 +84,49 @@ void displayTimeTableForTime(const vector<Course>& courses, const string& time, 
     }
 }
 
-void displayTimeTableForDay(const vector<Course>& courses, const string& day) 
+void displayTimeTableForDay(const vector<Course>& courses, const string& day)
 {
     cout << "\n\nTime table for " << day << ": " << endl;
 
     for (const auto& course : courses)
     {
-        if (course.timeslot.find(day) != string::npos) 
+        if (course.timeslot.find(day) != string::npos)
         {
             cout << "\n\nCourse: " << course.name << ", Time: " << course.timeslot << ", Teacher: " << course.teacher->Name << endl;
         }
     }
 }
 
-void displayTimeTable(const vector<Course>& timeTable) 
+void displayTimeTable(const vector<Course>& timeTable)
 {
-    for (const auto& course : timeTable) 
+    for (const auto& course : timeTable)
     {
         cout << "\n\nCourse: " << course.name << ", Time: " << course.timeslot << ", Room: " << course.room->code << endl;
     }
 }
 
-void addStudentsToRoom(Room& room, const vector<Student>& students) 
+void addStudentsToRoom(Room& room, const vector<Student>& students)
 {
-    for (const auto& student : students) 
+    for (const auto& student : students)
     {
         room.students.push_back(make_shared<Student>(student)); // Changed to use make_shared
     }
 }
 
-void displayStudentsPerRoom(const vector<Room>& rooms) 
+void displayStudentsPerRoom(const vector<Room>& rooms)
 {
-    for (const auto& room : rooms) 
+    for (const auto& room : rooms)
     {
         cout << "\n\nStudents in " << room.code << ":" << endl;
 
-        if (!room.students.empty()) 
+        if (!room.students.empty())
         {
-            for (const auto& student : room.students) 
+            for (const auto& student : room.students)
             {
                 cout << "- " << student->Name << " (" << student->studentSection << ")" << endl;
             }
-        } 
-        else 
+        }
+        else
         {
             cout << "\n\nNo students in this room." << endl;
         }
@@ -134,19 +134,19 @@ void displayStudentsPerRoom(const vector<Room>& rooms)
     }
 }
 
-void removeStudentFromRoom(Room& room, const string& studentName) 
+void removeStudentFromRoom(Room& room, const string& studentName)
 {
     auto it = room.students.begin();
 
-    while (it != room.students.end()) 
+    while (it != room.students.end())
     {
         if ((*it)->Name == studentName) // Perform case-sensitive comparison
-        {                                   
+        {
             it = room.students.erase(it);
             cout << "\n\nStudent " << studentName << " removed from room " << room.code << " successfully.\n";
             return; // Student found and removed, exit the function
-        } 
-        else 
+        }
+        else
         {
             ++it;
         }
@@ -154,27 +154,27 @@ void removeStudentFromRoom(Room& room, const string& studentName)
     // If the function reaches here, it means the student was not found in the room
     cout << "\n\nStudent " << studentName << " not found in room " << room.code << ".\n";
 }
-bool isRoomAvailableForMakeupClass(const vector<Course>& courses, const string& roomNumber, const string& time) 
+bool isRoomAvailableForMakeupClass(const vector<Course>& courses, const string& roomNumber, const string& time)
 {
-    for (const auto& course : courses) 
+    for (const auto& course : courses)
     {
-        if (course.room->code == roomNumber && course.timeslot == time) 
+        if (course.room->code == roomNumber && course.timeslot == time)
         {
             return false;
         }
     }
     return true;
 }
-void switchTeacherRoom(vector<Course>& courses, const string& courseCode, const string& newRoomNumber, vector<Room>& rooms) 
+void switchTeacherRoom(vector<Course>& courses, const string& courseCode, const string& newRoomNumber, vector<Room>& rooms)
 {
     for (auto& course : courses)
     {
-        if (course.code == courseCode) 
+        if (course.code == courseCode)
         {
             course.room = nullptr;
-            for (auto& room :  rooms) 
+            for (auto& room : rooms)
             {
-                if (room.code == newRoomNumber) 
+                if (room.code == newRoomNumber)
                 {
                     course.room = &room;
                     break;
@@ -182,7 +182,7 @@ void switchTeacherRoom(vector<Course>& courses, const string& courseCode, const 
             }
 
             if (course.room == nullptr)
-             {
+            {
                 cout << "\n\nRoom " << newRoomNumber << " not found!" << endl;
             }
             break;
@@ -192,7 +192,7 @@ void switchTeacherRoom(vector<Course>& courses, const string& courseCode, const 
 
 void addCourse(vector<Course>& courses, const string& courseCode, const string& courseName, Teacher& teacher, Room& room, const string& timeSlot) {
     // Check if the room is available at the given time slot
-    for (const auto& course : courses) 
+    for (const auto& course : courses)
     {
         if (course.room->code == room.code && course.timeslot == timeSlot)
         {
