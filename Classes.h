@@ -16,7 +16,7 @@ class User;
 
 class Person
 {
-    public:
+public:
 
     string Name;
     int ID;
@@ -24,7 +24,7 @@ class Person
 
 class Thing
 {
-    public:
+public:
 
     string name;
     string code;
@@ -32,7 +32,7 @@ class Thing
 
 class Student : public Person
 {
-    public:
+public:
 
     string studentSection;
 
@@ -40,14 +40,20 @@ class Student : public Person
 
 class Teacher : public Person
 {
-    public:
+public:
+
+    Teacher(string name, string specialization) {
+
+        this->Name = name;
+        this->specialization = specialization;
+    }
 
     string specialization;
 };
 
 class Room : public Thing
 {
-    public:
+public:
 
     int capacity;
     list<std::shared_ptr<Student> > students;  //Smart Pointers(Allows Multiple Pointers to point at the Same object) 
@@ -55,20 +61,20 @@ class Room : public Thing
 
 class Course : public Thing
 {
-    public:
+public:
 
     Teacher* teacher;
     string timeslot;
     Room* room;
 };
 
-class User 
+class User
 {
-    private:
+private:
     string username;
     string password;
 
-    public:
+public:
 
     User(string Username, string Password)
     {
@@ -76,7 +82,7 @@ class User
         password = Password;
     }
 
-    bool authenticate(string Username, string Password) 
+    bool authenticate(string Username, string Password)
     {
         return (username == Username && password == Password);
     }
@@ -87,19 +93,19 @@ class User
     }
 };
 
-class SYSTEM 
+class SYSTEM
 {
-    private:
+private:
 
     User* currentUser; //Pointer to the Current User
 
-    public:
+public:
     SYSTEM()
     {
         currentUser = nullptr;
     }
 
-    void setUser() 
+    void setUser()
     {
         string username, password;
         cout << "\n\nEnter username: ";
@@ -118,9 +124,9 @@ class SYSTEM
         cout << "\n\nEnter password: ";
         cin >> password;
 
-        if (currentUser != nullptr) 
+        if (currentUser != nullptr)
         {
-            if (currentUser->authenticate(username, password)) 
+            if (currentUser->authenticate(username, password))
             {
                 cout << "\n\nLogin successful. Welcome, " << currentUser->getUsername() << "!\n";
                 return true;
@@ -132,8 +138,8 @@ class SYSTEM
             }
         }
     }
-    
-    ~SYSTEM() 
+
+    ~SYSTEM()
     {
         delete currentUser; //Current user was dynamically allocated using the keyword 'new'
     }
