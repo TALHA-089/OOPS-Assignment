@@ -1,29 +1,32 @@
+#ifndef Functions_h
+#define Functions_h
+
 #pragma once
 #include "Classes.h"
-#include<vector>
-#include<map>
-#include<array>
+#include <iostream>
+#include <vector>
+#include <map>
+#include <algorithm>
+#include <iomanip>
+
+using namespace std;
+
+extern vector<Student> students;
+extern vector<Teacher> teachers;
+extern vector<Room> rooms;
+extern vector<Course> courses;
 
 // Function declarations
 void generateTeacherWiseTimeTable(const vector<Course>& courses);
 void generateSectionWiseTimeTable(const vector<Course>& courses);
 void generateRoomWiseTimeTable(const vector<Course>& courses);
-void displayTimeTableForTime(const vector<Course>& courses, const string& time, const string& day);
-void displayTimeTableForDay(const vector<Course>& courses, const string& day);
-void displayTimeTable(const vector<Course>& timeTable);
-void addStudentsToRoom(Room& room, const vector<Student>& students);
-void displayStudentsPerRoom(const vector<Room>& rooms);
-void removeStudentFromRoom(Room& room, const string& studentName);
-bool isRoomAvailableForMakeupClass(const vector<Course>& courses, const string& roomNumber, const string& time);
-void switchTeacherRoom(vector<Course>& courses, const string& courseCode, const string& newRoomNumber, vector<Room>& rooms);
-void addCourse(vector<Course>& courses, const string& courseCode, const string& courseName, Teacher& teacher, Room& room, const string& timeSlot);
-void addStudentsToRoom(std::shared_ptr<Room>& room, const std::vector<std::shared_ptr<Student> >& students);
-
-
+void viewDailyTimetable(const vector<Course>& courses);
+void queryStudentTimetable(const vector<Course>& courses);
+void generateStudentWiseTimeTable(const vector<Course>& courses);
 
 void generateTeacherWiseTimeTable(const vector<Course>& courses)
 {
-    map <string, vector<Course> > teacherTimeTable;
+    map<string, vector<Course> > teacherTimeTable;
 
     for (const auto& course : courses)
     {
@@ -32,32 +35,17 @@ void generateTeacherWiseTimeTable(const vector<Course>& courses)
 
     for (const auto& entry : teacherTimeTable)
     {
-        cout << "\n\nTeacher: " << entry.first << endl;
-        displayTimeTable(entry.second);
-        cout << endl << endl;
-    }
-}
-
-void generateSectionWiseTimeTable(const vector<Course>& courses)
-{
-    map <string, vector<Course> > sectionTimeTable;
-
-    for (const auto& course : courses)
-    {
-        sectionTimeTable[course.room->code].push_back(course);
-    }
-
-    for (const auto& entry : sectionTimeTable)
-    {
-        cout << "\n\nRoom: " << entry.first << endl;
-        displayTimeTable(entry.second);
-        cout << endl << endl;
+        cout << "\nTeacher: " << entry.first << endl;
+        for (const auto& course : entry.second)
+        {
+            cout <<"\nRoom: " << course.room->code <<", Time: " << course.timeslot << ", Day: " << course.Day << endl;
+        }
     }
 }
 
 void generateRoomWiseTimeTable(const vector<Course>& courses)
 {
-    map <string, vector<Course> > roomTimeTable;
+    map<string, vector<Course> > roomTimeTable;
 
     for (const auto& course : courses)
     {
@@ -66,150 +54,105 @@ void generateRoomWiseTimeTable(const vector<Course>& courses)
 
     for (const auto& entry : roomTimeTable)
     {
-        cout << "\n\nRoom: " << entry.first << endl;
-        displayTimeTable(entry.second);
-        cout << endl << endl;
-    }
-}
-
-void displayTimeTableForTime(const vector<Course>& courses, const string& time, const string& day)
-{
-    cout << "\n\nCourses at " << time << " on " << day << ": " << endl;
-
-    for (const auto& course : courses)
-    {
-        if (course.timeslot == time + " " + day) {
-            cout << "\n\nCourse: " << course.name << ", Teacher: " << course.teacher->Name << endl;
+        cout << "\nRoom: " << entry.first << endl;
+        for (const auto& course : entry.second)
+        {
+            cout << "Course: " << course.code << " - " << course.name << ", Teacher: " << course.teacher->Name <<", Time: " << course.timeslot << ", Day: " << course.Day << " " << course.section << endl;
         }
     }
 }
 
-void displayTimeTableForDay(const vector<Course>& courses, const string& day)
+void generateSectionWiseTimeTable(const vector<Course>& courses)
 {
-    cout << "\n\nTime table for " << day << ": " << endl;
+    map<string, vector<Course> >  sectionTimeTable;
 
     for (const auto& course : courses)
     {
-        if (course.timeslot.find(day) != string::npos)
+        sectionTimeTable[course.section].push_back(course);
+    }
+
+    for (const auto& entry : sectionTimeTable)
+    {
+        cout << "\n" << entry.first << endl;
+        for (const auto& course : entry.second)
         {
-            cout << "\n\nCourse: " << course.name << ", Time: " << course.timeslot << ", Teacher: " << course.teacher->Name << endl;
+            cout << "Course: " << course.code << " - " << course.name << ", Teacher: " << course.teacher->Name <<", Time: " << course.timeslot << ", Day: " << course.Day << endl;
+
+        }
+    
+    }
+}
+
+void viewDailyTimetable(const vector<Course>& courses)
+{
+    string day;
+    cout << "\nEnter day (e.g., Monday, Tuesday, etc.): ";
+    getline(cin, day);
+
+    cout << "\nTimetable for " << day << ":" << endl;
+
+    for (const auto& course : courses)
+    {
+        if (course.Day == day)
+        {
+            cout << "Course: " << course.code << " - " << course.name << ", Time: " << course.timeslot << ", Room: " << course.room->code << ", Teacher: " << course.teacher->Name << ", " << course.section << endl;
         }
     }
 }
 
-void displayTimeTable(const vector<Course>& timeTable)
+void query1(const vector <Course>& courses)
 {
-    for (const auto& course : timeTable)
+    string Day, f_time, t_time;
+    cout<<"\n\nEnter the Day: ";
+    getline(cin,Day);
+    cout<<"\n\nEnter Start Timeslot: ";
+    cin >> f_time >> t_time;
+    string timeSlot;
+    timeSlot = f_time + "->" + t_time;
+    
+    for(const auto &it : courses)
     {
-        cout << "\n\nCourse: " << course.name << ", Time: " << course.timeslot << ", Room: " << course.room->code << endl;
-    }
-}
-
-void addStudentsToRoom(Room& room, const vector<Student>& students)
-{
-    for (const auto& student : students)
-    {
-        room.students.push_back(make_shared<Student>(student)); // Changed to use make_shared
-    }
-}
-
-void displayStudentsPerRoom(const vector<Room>& rooms)
-{
-    for (const auto& room : rooms)
-    {
-        cout << "\n\nStudents in " << room.code << ":" << endl;
-
-        if (!room.students.empty())
+        if(it.Day == Day)
         {
-            for (const auto& student : room.students)
+            if(it.timeslot == timeSlot)
             {
-                cout << "- " << student->Name << " (" << student->studentSection << ")" << endl;
+                cout << "\n" << it.teacher->Name <<" is the one taking the Class on " << Day << " at " << timeSlot << endl;
+                break;
             }
         }
-        else
-        {
-            cout << "\n\nNo students in this room." << endl;
-        }
-        cout << endl;
     }
 }
 
-void removeStudentFromRoom(Room& room, const string& studentName)
+void generateStudentWiseTimeTable(const vector<Course>& courses)
 {
-    auto it = room.students.begin();
-
-    while (it != room.students.end())
+    string Section_choice;
+    string Section;
+    map <string, vector<Course> >StudentTimeTable;
+    
+    for(const auto &course : courses)
     {
-        if ((*it)->Name == studentName) // Perform case-sensitive comparison
-        {
-            it = room.students.erase(it);
-            cout << "\n\nStudent " << studentName << " removed from room " << room.code << " successfully.\n";
-            return; // Student found and removed, exit the function
-        }
-        else
-        {
-            ++it;
-        }
+        StudentTimeTable[course.section].push_back(course);
     }
-    // If the function reaches here, it means the student was not found in the room
-    cout << "\n\nStudent " << studentName << " not found in room " << room.code << ".\n";
-}
-bool isRoomAvailableForMakeupClass(const vector<Course>& courses, const string& roomNumber, const string& time)
-{
-    for (const auto& course : courses)
+    
+    cout<<"\n\nChoose the Section of the Student A or B: ";
+    cin>>Section_choice;
+    cin.ignore();
+    Section = "Section-" + Section_choice;
+    
+    for(const auto &it : StudentTimeTable)
     {
-        if (course.room->code == roomNumber && course.timeslot == time)
+        if(Section == it.first)
         {
-            return false;
-        }
-    }
-    return true;
-}
-void switchTeacherRoom(vector<Course>& courses, const string& courseCode, const string& newRoomNumber, vector<Room>& rooms)
-{
-    for (auto& course : courses)
-    {
-        if (course.code == courseCode)
-        {
-            course.room = nullptr;
-            for (auto& room : rooms)
+            cout << it.first << ": " << endl;
+            for(const auto& course : it.second)
             {
-                if (room.code == newRoomNumber)
-                {
-                    course.room = &room;
-                    break;
-                }
-            }
+                cout << "Course: " << course.code << " - " << course.name << ", Teacher: " << course.teacher->Name <<", Time: " << course.timeslot << ", Day: " << course.Day << endl;
 
-            if (course.room == nullptr)
-            {
-                cout << "\n\nRoom " << newRoomNumber << " not found!" << endl;
             }
-            break;
         }
+        
     }
+    
 }
 
-void addCourse(vector<Course>& courses, const string& courseCode, const string& courseName, Teacher& teacher, Room& room, const string& timeSlot) {
-    // Check if the room is available at the given time slot
-    for (const auto& course : courses)
-    {
-        if (course.room->code == room.code && course.timeslot == timeSlot)
-        {
-            cout << "\n\nRoom " << room.code << " is not available at the given time slot." << endl;
-            return; // Return if the room is not available
-        }
-    }
-
-    // Create the new course and add it to the list of courses
-    Course newCourse;
-    newCourse.code = courseCode;
-    newCourse.name = courseName;
-    newCourse.teacher = &teacher;
-    newCourse.room = &room;
-    newCourse.timeslot = timeSlot;
-    courses.push_back(newCourse);
-
-    cout << "\n\nCourse " << courseName << " added successfully." << endl;
-    return; // Return to main menu loop
-}
+#endif
